@@ -26,7 +26,7 @@
             currentPlan === plan.name ? 'border-brand bg-white' : 'border-slate-100 bg-white'
           ]"
         >
-          <div v-if="currentPlan === plan.name" class="absolute -top-3 right-8 bg-brand text-white text-[9px] font-black px-3 py-1 rounded-full uppercase">
+          <div v-if="currentPlan === plan.name" class="absolute -top-1 right-8 bg-brand text-white text-[9px] font-black px-3 py-1 rounded-full uppercase">
             Current
           </div>
 
@@ -95,18 +95,14 @@ const planDetails = [
     name: 'Free', price: 0, icon: UserIcon, color: 'bg-slate-400',
     features: ['50個までのアイテム登録', '基本統計機能', '広告表示あり']
   },
-  { 
-    name: 'Basic', price: 300, icon: ShieldIcon, color: 'bg-emerald-500',
-    features: ['登録制限なし', 'クラウドバックアップ', '広告非表示']
-  },
-  { 
-    name: 'Pro', price: 980, icon: StarIcon, color: 'bg-indigo-500',
-    features: ['推し別の詳細分析', '複数端末同期', 'カスタムテーマカラー']
-  },
-  { 
-    name: 'Master', price: 2980, icon: CrownIcon, color: 'bg-amber-500',
-    features: ['すべての限定機能', '専任サポート', '先行ベータ機能アクセス']
-  }
+  // { 
+  //   name: 'Basic', price: 300, icon: StarIcon, color: 'bg-emerald-500',
+  //   features: ['登録制限なし', 'クラウドバックアップ', '広告非表示']
+  // },
+  // { 
+  //   name: 'Pro', price: 980, icon: CrownIcon, color: 'bg-amber-500',
+  //   features: ['推し別の詳細分析', '複数端末同期', 'カスタムテーマカラー']
+  // }
 ]
 
 const planStyles = {

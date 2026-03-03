@@ -1,41 +1,39 @@
 <template>
   <div class="space-y-6 animate-in slide-in-from-right-4 duration-300">
-    
+
     <div v-if="userSettings.oshis && userSettings.oshis.length > 0" class="space-y-3">
       <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">My Oshi List</label>
       <div class="flex flex-wrap gap-3">
-        <div 
-          v-for="oshi in userSettings.oshis" 
-          :key="oshi.id"
-          @click="selectOshiFromList(oshi)" 
-          class="flex items-center gap-3 p-3 rounded-2xl border-2 transition-all cursor-pointer active:scale-95"
-          :class="userSettings.oshiName === oshi.name ? 'border-brand bg-brand-light' : 'border-slate-100 bg-white'"
-        >
-          <div class="w-6 h-6 rounded-full border-2 border-white shadow-sm" :style="{ backgroundColor: oshi.color }"></div>
+        <div v-for="oshi in userSettings.oshis" :key="oshi.id"
+          class="relative flex items-center gap-3 p-3 pr-10 rounded-2xl border-2 transition-all active:scale-95"
+          :class="oshiName === oshi.name ? 'border-brand bg-brand-light' : 'border-slate-100 bg-white'"
+          @click="selectOshiFromList(oshi)">
+          <div class="w-6 h-6 rounded-full border-2 border-white shadow-sm" :style="{ backgroundColor: oshi.color }">
+          </div>
           <span class="text-xs font-bold text-slate-700">{{ oshi.name }}</span>
+
+          <button @click.stop="removeOshi(oshi.id)"
+            class="absolute right-2 w-6 h-6 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center transition-colors active:bg-red-500 active:text-white"
+            aria-label="削除">
+            <XIcon :size="14" stroke-width="3" />
+          </button>
         </div>
       </div>
     </div>
 
     <div class="bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-sm space-y-6">
-      
+
       <div class="relative">
-        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 block mb-2">推しの名前を追加・変更</label>
-        <input 
-          v-model="oshiName" 
-          type="text" 
-          placeholder="推しの名前を入力..." 
-          class="w-full p-4 bg-slate-50 rounded-2xl border-none font-bold text-slate-700 focus:ring-2 focus:ring-brand/20 transition-all outline-none" 
-        />
-        
+        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 block mb-2">
+          推しの名前を追加・変更
+        </label>
+        <input v-model="oshiName" type="text" placeholder="推しの名前を入力..."
+          class="w-full p-4 bg-slate-50 rounded-2xl border-none font-bold text-slate-700 focus:ring-2 focus:ring-brand/20 transition-all outline-none" />
+
         <transition name="fade">
           <div v-if="suggestions.length > 0" class="flex gap-2 mt-3 overflow-x-auto pb-2 scrollbar-hide">
-            <button 
-              v-for="person in suggestions" 
-              :key="person.name"
-              @click="applySuggestion(person)"
-              class="flex items-center gap-2 px-4 py-2 bg-white border border-slate-100 rounded-full shadow-sm whitespace-nowrap hover:border-brand/30 transition-colors active:scale-95"
-            >
+            <button v-for="person in suggestions" :key="person.name" @click="applySuggestion(person)"
+              class="flex items-center gap-2 px-4 py-2 bg-white border border-slate-100 rounded-full shadow-sm whitespace-nowrap hover:border-brand/30 transition-colors active:scale-95">
               <div class="w-2.5 h-2.5 rounded-full" :style="{ backgroundColor: person.color }"></div>
               <span class="text-[11px] font-bold text-slate-600">{{ person.name }}</span>
             </button>
@@ -49,95 +47,116 @@
           <span class="text-[10px] font-mono text-slate-300">{{ oshiColor.toUpperCase() }}</span>
         </div>
         <div class="flex items-center gap-6">
-          <div 
-            class="w-20 h-20 rounded-[2.5rem] shadow-xl border-4 border-white transition-all duration-500 flex items-center justify-center text-white" 
-            :style="{ backgroundColor: oshiColor }"
-          >
+          <div
+            class="w-20 h-20 rounded-[2.5rem] shadow-xl border-4 border-white transition-all duration-500 flex items-center justify-center text-white"
+            :style="{ backgroundColor: oshiColor }">
             <HeartIcon :size="32" fill="currentColor" class="opacity-30" />
           </div>
           <div class="flex-grow">
-            <input 
-              v-model="oshiColor" 
-              type="color" 
-              class="w-full h-12 bg-transparent cursor-pointer rounded-lg overflow-hidden" 
-            />
+            <input v-model="oshiColor" type="color"
+              class="w-full h-12 bg-transparent cursor-pointer rounded-lg overflow-hidden" />
             <p class="text-[9px] text-slate-400 mt-2 font-medium">※色をタップしてカスタムカラーを選択できます</p>
           </div>
         </div>
       </div>
     </div>
 
-    <button 
-      @click="handleSave" 
-      class="w-full py-4 bg-slate-900 text-white rounded-2xl font-black shadow-lg btn-bounce active:scale-95 transition-transform"
-    >
+    <button @click="handleSave"
+      class="w-full py-4 bg-slate-900 text-white rounded-2xl font-black shadow-lg btn-bounce active:scale-95 transition-transform">
       この推しをメインに設定
     </button>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { Heart as HeartIcon } from 'lucide-vue-next'
-// パスが正しいか確認してください
+import { ref, computed, onMounted, watch } from 'vue'
+import { Heart as HeartIcon, X as XIcon } from 'lucide-vue-next'
 import oshiConfig from '../../data/oshi-config.json'
 
 const props = defineProps({
-  userSettings: {
-    type: Object,
-    required: true
-  }
+  userSettings: { type: Object, required: true }
 })
 
-const emit = defineEmits(['save'])
+const emit = defineEmits(['save', 'remove-oshi'])
 
 const oshiName = ref('')
 const oshiColor = ref('#6366f1')
 
-// 初期値をセット
+// 初期表示の同期
 onMounted(() => {
   oshiName.value = props.userSettings.oshiName || ''
   oshiColor.value = props.userSettings.oshiColor || '#6366f1'
 })
 
-// 🔍 予測変換ロジック
+// userSettings が外部（App.vueなど）で変更された場合に追従させる
+watch(() => props.userSettings.oshiName, (newVal) => { oshiName.value = newVal || '' })
+watch(() => props.userSettings.oshiColor, (newVal) => { oshiColor.value = newVal || '#6366f1' })
+
+// 🔍 予測変換
 const suggestions = computed(() => {
   const query = oshiName.value.trim().toLowerCase()
-  if (!query || query.length < 1) return []
-
-  return oshiConfig.oshi_masters.filter(person => {
-    const nameMatch = person.name.toLowerCase().includes(query)
-    const groupMatch = person.groups?.some(g => g.toLowerCase().includes(query))
-    return nameMatch || groupMatch
-  }).slice(0, 5)
+  if (!query) return []
+  return oshiConfig.oshi_masters.filter(person =>
+    person.name.toLowerCase().includes(query) ||
+    person.groups?.some(g => g.toLowerCase().includes(query))
+  ).slice(0, 5)
 })
 
-// 1. リストから既存の推しを選ぶ
+// リストから選択（名前と色をセット）
 const selectOshiFromList = (oshi) => {
   oshiName.value = oshi.name
   oshiColor.value = oshi.color
 }
 
-// 2. 予測変換から選ぶ
+// 予測変換から適用
 const applySuggestion = (person) => {
   oshiName.value = person.name
   oshiColor.value = person.color
 }
 
-// 保存
+// 保存（App.vue の updateSettings が呼ばれる）
 const handleSave = () => {
   if (!oshiName.value.trim()) return
-  emit('save', { 
-    name: oshiName.value, 
-    color: oshiColor.value 
+  emit('save', {
+    name: oshiName.value,
+    color: oshiColor.value
   })
+}
+
+// ❌ 削除（App.vue の removeOshi が呼ばれる）
+const removeOshi = (id) => {
+  if (confirm('リストから削除しますか？\n（この推しの設定が消去されます）')) {
+    emit('remove-oshi', id)
+  }
 }
 </script>
 
 <style scoped>
-.scrollbar-hide::-webkit-scrollbar { display: none; }
-.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
 
-.bg-brand-light { background-color: var(--brand-color-light); }
-.border-brand { border-color: var(--brand-color); }
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* App.vueで定義した変数を参照 */
+.bg-brand-light {
+  background-color: var(--brand-color-light);
+}
+
+.border-brand {
+  border-color: var(--brand-color);
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
 </style>

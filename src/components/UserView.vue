@@ -5,7 +5,7 @@
 
         <div class="px-2 py-4 flex items-center gap-4">
           <div
-            class="w-16 h-16 rounded-full bg-brand-light flex items-center justify-center text-brand border-2 border-brand/20 shadow-sm">
+            class="w-16 h-16 rounded-full bg-brand-light flex items-center justify-center text-brand border-2 border-brand/20 shadow-sm transition-colors duration-500">
             <HeartIcon :size="28" fill="currentColor" class="opacity-80" />
           </div>
           <div>
@@ -28,6 +28,12 @@
             <ChevronRightIcon :size="18" class="text-slate-300 group-hover:text-brand transition-colors" />
           </button>
         </div>
+
+        <div class="px-4 pt-4">
+          <button @click="$emit('logout')" class="w-full py-4 text-slate-400 font-bold text-sm hover:text-red-500 transition-colors">
+            ログアウト
+          </button>
+        </div>
       </div>
 
       <div v-else class="pb-10">
@@ -42,14 +48,24 @@
           </div>
         </div>
 
-        <OshiSettings v-if="activeSubViewId === 'oshi'" :userSettings="userSettings"
-          @save="(data) => $emit('update-settings', data)" />
+        <OshiSettings 
+          v-if="activeSubViewId === 'oshi'" 
+          :userSettings="userSettings" 
+          @save="$emit('update-settings', $event)"
+          @remove-oshi="$emit('remove-oshi', $event)" 
+        />
 
-        <LocaleSettings v-else-if="activeSubViewId === 'locale'" :currentLang="userSettings.language"
-          :currentRegion="userSettings.region" @save="(data) => $emit('update-locale', data)" />
+        <LocaleSettings 
+          v-else-if="activeSubViewId === 'locale'" 
+          :userSettings="userSettings"
+          @save="(data) => $emit('update-locale', data)" 
+        />
 
-        <AppSettings v-else-if="activeSubViewId === 'app'" :currentSettings="userSettings"
-          @update="(data) => $emit('update-app', data)" />
+        <AppSettings 
+          v-else-if="activeSubViewId === 'app'" 
+          :userSettings="userSettings"
+          @update="(data) => $emit('update-app', data)" 
+        />
 
         <div v-else class="py-20 text-center text-slate-300">
           <p class="font-bold">Coming Soon...</p>
@@ -69,6 +85,7 @@ import {
   Globe as GlobeIcon
 } from 'lucide-vue-next'
 
+// コンポーネント名の統一
 import OshiSettings from './settings/OshiSettings.vue'
 import AppSettings from './settings/AppSettings.vue'
 import LocaleSettings from './settings/LocaleSettings.vue'
@@ -84,8 +101,8 @@ const props = defineProps({
   }
 })
 
-// 親（App.vue）へイベントを飛ばす定義
-defineEmits(['update-settings', 'update-locale', 'update-app'])
+// emitの定義を確実に
+defineEmits(['update-settings', 'remove-oshi', 'logout', 'update-locale', 'update-app'])
 
 const activeSubViewId = ref(null)
 
@@ -99,30 +116,3 @@ const currentTitle = computed(() => {
   return menuItems.find(m => m.id === activeSubViewId.value)?.label || ''
 })
 </script>
-
-<style scoped>
-/* スライドフェードアニメーション */
-.slide-fade-enter-active,
-.slide-fade-leave-active {
-  transition: all 0.3s ease-out;
-}
-
-.slide-fade-enter-from {
-  transform: translateX(20px);
-  opacity: 0;
-}
-
-.slide-fade-leave-to {
-  transform: translateX(-20px);
-  opacity: 0;
-}
-
-/* 推し色反映用クラス */
-.bg-brand-light {
-  background-color: var(--brand-color-light);
-}
-
-.text-brand {
-  color: var(--brand-color);
-}
-</style>
