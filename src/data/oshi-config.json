@@ -1,0 +1,9 @@
+{
+  "oshi_masters": [
+    { "id": 1, "name": "ななもり", "color": "#f472b6", "groups": ["すとぷり", "STPR"] },
+    { "id": 2, "name": "蒼井 海", "color": "#60a5fa", "groups": ["ブルースカイ", "1期生"] },
+    { "id": 3, "name": "翠川 蓮", "color": "#34d399", "groups": ["グリーングリーン"] },
+    { "id": 4, "name": "琥珀 ひかり", "color": "#fbbf24", "groups": ["イエローサンシャイン"] }
+  ],
+  "default_color": "#6366f1"
+}

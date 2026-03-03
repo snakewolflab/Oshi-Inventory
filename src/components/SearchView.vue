@@ -43,6 +43,7 @@
         <div 
           v-for="item in filteredItems" 
           :key="item.id" 
+          @click="$emit('item-click', item)"
           class="flex items-center gap-4 p-3 bg-white rounded-2xl border border-slate-100 shadow-sm animate-in fade-in slide-in-from-bottom-2 duration-300"
         >
           <div :class="`w-12 h-12 rounded-xl ${item.color} flex items-center justify-center text-white shrink-0 opacity-60`">
@@ -75,6 +76,7 @@ import {
   PackageSearch as PackageSearchIcon 
 } from 'lucide-vue-next'
 
+defineEmits(['item-click'])
 const props = defineProps({
   items: Array
 })

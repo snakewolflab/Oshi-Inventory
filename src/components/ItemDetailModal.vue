@@ -54,7 +54,7 @@
               <button class="flex-grow py-4 bg-slate-900 text-white rounded-2xl font-black shadow-lg btn-bounce">
                 編集する
               </button>
-              <button class="p-4 bg-rose-50 text-rose-500 rounded-2xl btn-bounce border border-rose-100">
+              <button @click="handleDelete" class="p-4 bg-rose-50 text-rose-500 rounded-2xl btn-bounce border border-rose-100">
                 <TrashIcon :size="20" />
               </button>
             </div>
@@ -69,10 +69,22 @@
 <script setup>
 import { X as XIcon, Image as ImageIcon, Trash2 as TrashIcon } from 'lucide-vue-next'
 
-defineProps({
+// src/components/ItemDetailModal.vue
+
+const props = defineProps({
   item: Object
 })
-defineEmits(['close'])
+
+// 👇 これを追加して、イベントを明示的に宣言する
+const emit = defineEmits(['close', 'delete-item'])
+
+// 削除ボタンを押した時の関数（例）
+const handleDelete = () => {
+  if (props.item) {
+    emit('delete-item', props.item.id)
+    emit('close') // 削除したらモーダルを閉じる
+  }
+}
 </script>
 
 <style scoped>
